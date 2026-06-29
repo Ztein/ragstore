@@ -13,10 +13,11 @@ that belongs to the consuming application (e.g. doclib).
    recorded as `failed` with the error string.
 3. **Minimal / no fallbacks.** If something is misconfigured or a dependency is down, it
    raises — we do not silently degrade (no "offline embedding mode", no swallowed
-   exceptions). The only "fake" provider lives in `tests/` and is a real HTTP server, so
-   tests stay end-to-end without baking a fake path into product code.
-4. **Test end-to-end.** Tests run against a **real Weaviate** and a **real SQLite file**,
-   and (when keys are present) the **real** embedding/LLM provider — not mocks.
+   exceptions).
+4. **Never mock or fake — test against the real source.** No mocks, no fakes, no stub
+   servers, in product code OR tests. Tests run against a **real Weaviate**, a **real
+   SQLite file**, and the **real** embedding/LLM provider (Berget). Real credentials are
+   required to run the suite; provide them via `.env` locally or CI secrets.
 5. **External providers only.** Embeddings and the generation LLM are external,
    OpenAI-compatible HTTP endpoints configured via env. No ML models in the image.
 6. **Hardened image.** The built image must pass Trivy with **zero fixable HIGH/CRITICAL
@@ -38,13 +39,17 @@ Module map (`src/ragstore/`): `config.py` (fail-loud settings), `sqlite_store.py
 ## Working on this repo
 
 ```bash
-docker compose up -d weaviate      # start the test dependency
+docker compose up -d weaviate      # start the real Weaviate dependency
+cp .env.example .env               # fill in real EMBEDDING_*/LLM_* (Berget) credentials
 uv sync --extra dev                # install (Python 3.13 via uv)
-uv run pytest                      # full suite (real Weaviate + SQLite + fake provider)
+uv run pytest                      # full suite (real Weaviate + SQLite + real provider)
 uv run ruff check src tests        # lint
-uv run pytest -m "embedding or llm"  # also hit the real provider (needs EMBEDDING_*/LLM_* env)
 make build && make scan            # build image + Trivy gate
 ```
+
+The suite hits the real embedding/LLM provider — expect occasional transient provider
+errors to surface (that's the point: we don't hide them behind a fake). Re-run if a real
+dependency hiccups.
 
 Config is environment-driven and fail-loud — see `.env.example`. The component is built
 as an image and run as a container (e.g. on the ztein Mac Mini); deployment is **not**

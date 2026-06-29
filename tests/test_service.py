@@ -19,7 +19,7 @@ async def test_create_collection_and_stats(service):
     cid = await service.create_collection("docs")
     coll = await service.get_collection(cid)
     assert coll.name == "docs"
-    assert coll.config["embedding_dim"] == 8
+    assert coll.config["embedding_dim"] == service.settings.embedding_dim
     stats = await service.get_stats(cid)
     assert stats == {
         "id": cid,
@@ -124,7 +124,7 @@ async def test_query_with_generation(service, worker):
     result = await service.query(
         [cid], "apple", k=3, mode="semantic", generate={"instructions": "Be terse."}
     )
-    assert result["answer"].startswith("ANSWER[")
+    assert isinstance(result["answer"], str) and result["answer"].strip()
     assert result["citations"][0]["document_external_id"] == "a"
     assert result["chunks"]
 

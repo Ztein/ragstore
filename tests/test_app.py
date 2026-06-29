@@ -42,7 +42,7 @@ async def test_x_api_key_header_accepted(service):
         assert (await c.get("/collections", headers={"X-API-Key": "test-key"})).status_code == 200
 
 
-async def test_create_and_get_collection(api):
+async def test_create_and_get_collection(api, provider):
     r = await api.post("/collections", json={"name": "docs"})
     assert r.status_code == 201
     cid = r.json()["id"]
@@ -52,7 +52,7 @@ async def test_create_and_get_collection(api):
     body = got.json()
     assert body["name"] == "docs"
     assert body["doc_count"] == 0
-    assert body["config"]["embedding_dim"] == 8
+    assert body["config"]["embedding_dim"] == provider["embedding_dim"]
 
     listing = (await api.get("/collections")).json()
     assert [c["id"] for c in listing] == [cid]
@@ -93,7 +93,7 @@ async def test_query_with_generation(api, worker):
         "generate": {"instructions": "Be terse."},
     })
     body = r.json()
-    assert body["answer"].startswith("ANSWER[")
+    assert isinstance(body["answer"], str) and body["answer"].strip()
     assert body["citations"][0]["document_external_id"] == "a"
 
 
