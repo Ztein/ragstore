@@ -44,9 +44,7 @@ class EmbeddingClient:
                 headers={"Authorization": f"Bearer {self._api_key}"},
             )
         if resp.status_code != 200:
-            raise RuntimeError(
-                f"embedding provider returned {resp.status_code}: {resp.text[:500]}"
-            )
+            raise RuntimeError(f"embedding provider returned {resp.status_code}: {resp.text[:500]}")
         data = resp.json()["data"]
         vectors = [d["embedding"] for d in sorted(data, key=lambda d: d["index"])]
         if len(vectors) != len(texts):

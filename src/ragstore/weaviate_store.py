@@ -38,9 +38,7 @@ _PROPERTIES = [
     Property(name="source_uri", data_type=DataType.TEXT, tokenization=Tokenization.FIELD),
     Property(name="location", data_type=DataType.TEXT, tokenization=Tokenization.FIELD),
     Property(name="classification", data_type=DataType.TEXT, tokenization=Tokenization.FIELD),
-    Property(
-        name="acl_principals", data_type=DataType.TEXT_ARRAY, tokenization=Tokenization.FIELD
-    ),
+    Property(name="acl_principals", data_type=DataType.TEXT_ARRAY, tokenization=Tokenization.FIELD),
     Property(name="metadata", data_type=DataType.TEXT, tokenization=Tokenization.FIELD),
 ]
 

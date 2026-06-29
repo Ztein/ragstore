@@ -1,0 +1,3 @@
+# Trivy ignore file.
+# We gate on fixable HIGH/CRITICAL (`--ignore-unfixed`). List specific CVE IDs here only
+# with a justification and a review date if an unfixed finding ever needs explicit waiving.

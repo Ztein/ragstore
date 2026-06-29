@@ -1,8 +1,8 @@
 """Shared test fixtures.
 
 No mocks, no fakes — tests run against the **real** dependencies: a real Weaviate
-instance, a real SQLite file, and the **real** embedding/LLM provider (Berget,
-OpenAI-compatible). Provider config comes from the environment / a local `.env`.
+instance, a real SQLite file, and the **real** external embedding/LLM provider
+(OpenAI-compatible). Provider config comes from the environment / a local `.env`.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ def _require_env(name: str) -> str:
 
 @pytest.fixture(scope="session")
 def provider() -> dict:
-    """Real embedding + LLM provider config (e.g. Berget). No fake fallback."""
+    """Real embedding + LLM provider config (OpenAI-compatible). No fake fallback."""
     return {
         "embedding_base_url": _require_env("EMBEDDING_BASE_URL"),
         "embedding_model": _require_env("EMBEDDING_MODEL"),

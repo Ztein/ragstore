@@ -26,10 +26,24 @@ async def seeded(wstore, vecs):
     await wstore.add_chunks(
         cid,
         [
-            _chunk("doc-a", 0, APPLE, vecs["apple"],
-                   title="Fruit", classification="public", acl_principals=["grp-1"]),
-            _chunk("doc-b", 0, CARROT, vecs["carrot"],
-                   title="Veg", classification="internal", acl_principals=["grp-2"]),
+            _chunk(
+                "doc-a",
+                0,
+                APPLE,
+                vecs["apple"],
+                title="Fruit",
+                classification="public",
+                acl_principals=["grp-1"],
+            ),
+            _chunk(
+                "doc-b",
+                0,
+                CARROT,
+                vecs["carrot"],
+                title="Veg",
+                classification="internal",
+                acl_principals=["grp-2"],
+            ),
         ],
     )
     return cid
@@ -64,7 +78,11 @@ async def test_hybrid_search_returns_scored_chunks(wstore, seeded, vecs):
 
 async def test_filter_by_classification(wstore, seeded, vecs):
     results = await wstore.search(
-        [seeded], vector=vecs["apple"], text="", k=5, mode="semantic",
+        [seeded],
+        vector=vecs["apple"],
+        text="",
+        k=5,
+        mode="semantic",
         filters={"classification": "internal"},
     )
     assert {r["document_external_id"] for r in results} == {"doc-b"}

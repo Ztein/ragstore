@@ -18,3 +18,7 @@ data/
 
 # Tooling
 .claude/
+
+# Environment / infra-private notes — never commit (see CLAUDE.md memory)
+*.local.md
+.local/

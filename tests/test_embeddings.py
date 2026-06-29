@@ -1,4 +1,4 @@
-"""Embedding client against the real provider (Berget) over HTTP — no fakes."""
+"""Embedding client against the real external provider over HTTP — no fakes."""
 
 import httpx
 import pytest

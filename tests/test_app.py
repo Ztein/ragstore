@@ -8,9 +8,15 @@ META = {"title": "Doc A", "source_uri": "https://x/a", "classification": "public
 
 
 async def _ingest(api, worker, cid, ext, content, meta=META, version="v1"):
-    r = await api.post(f"/collections/{cid}/documents", json={
-        "external_id": ext, "content": content, "metadata": meta, "version_token": version,
-    })
+    r = await api.post(
+        f"/collections/{cid}/documents",
+        json={
+            "external_id": ext,
+            "content": content,
+            "metadata": meta,
+            "version_token": version,
+        },
+    )
     assert r.status_code == 200, r.text
     job_id = r.json()["job_id"]
     assert await worker.run_once() is True
@@ -78,9 +84,15 @@ async def test_full_ingest_query_flow(api, worker):
     stats = (await api.get(f"/collections/{cid}/stats")).json()
     assert stats["doc_count"] == 1 and stats["chunk_count"] >= 1
 
-    r = await api.post("/query", json={
-        "collection_ids": [cid], "text": "apple banana fruit salad", "k": 3, "mode": "semantic",
-    })
+    r = await api.post(
+        "/query",
+        json={
+            "collection_ids": [cid],
+            "text": "apple banana fruit salad",
+            "k": 3,
+            "mode": "semantic",
+        },
+    )
     assert r.status_code == 200
     assert r.json()["chunks"][0]["document_external_id"] == "a"
 
@@ -88,10 +100,16 @@ async def test_full_ingest_query_flow(api, worker):
 async def test_query_with_generation(api, worker):
     cid = (await api.post("/collections", json={"name": "docs"})).json()["id"]
     await _ingest(api, worker, cid, "a", "apple banana fruit")
-    r = await api.post("/query", json={
-        "collection_ids": [cid], "text": "apple", "k": 3, "mode": "semantic",
-        "generate": {"instructions": "Be terse."},
-    })
+    r = await api.post(
+        "/query",
+        json={
+            "collection_ids": [cid],
+            "text": "apple",
+            "k": 3,
+            "mode": "semantic",
+            "generate": {"instructions": "Be terse."},
+        },
+    )
     body = r.json()
     assert isinstance(body["answer"], str) and body["answer"].strip()
     assert body["citations"][0]["document_external_id"] == "a"
@@ -114,8 +132,9 @@ async def test_delete_by_filter_endpoint(api, worker):
     cid = (await api.post("/collections", json={"name": "docs"})).json()["id"]
     await _ingest(api, worker, cid, "a", "x", {"path": "/root/a.md"})
     await _ingest(api, worker, cid, "b", "y", {"path": "/other/b.md"})
-    r = await api.post(f"/collections/{cid}/documents/delete-by-filter",
-                       json={"filter": {"path_prefix": "/root/"}})
+    r = await api.post(
+        f"/collections/{cid}/documents/delete-by-filter", json={"filter": {"path_prefix": "/root/"}}
+    )
     assert r.json() == {"deleted": ["a"]}
 
 

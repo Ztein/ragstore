@@ -16,8 +16,9 @@ that belongs to the consuming application (e.g. doclib).
    exceptions).
 4. **Never mock or fake — test against the real source.** No mocks, no fakes, no stub
    servers, in product code OR tests. Tests run against a **real Weaviate**, a **real
-   SQLite file**, and the **real** embedding/LLM provider (Berget). Real credentials are
-   required to run the suite; provide them via `.env` locally or CI secrets.
+   SQLite file**, and the **real** external embedding/LLM provider. Real credentials are
+   required to run the provider tests; provide them via `.env` locally or CI secrets.
+   Without credentials those tests skip (they are never replaced by a fake).
 5. **External providers only.** Embeddings and the generation LLM are external,
    OpenAI-compatible HTTP endpoints configured via env. No ML models in the image.
 6. **Hardened image.** The built image must pass Trivy with **zero fixable HIGH/CRITICAL
@@ -40,7 +41,7 @@ Module map (`src/ragstore/`): `config.py` (fail-loud settings), `sqlite_store.py
 
 ```bash
 docker compose up -d weaviate      # start the real Weaviate dependency
-cp .env.example .env               # fill in real EMBEDDING_*/LLM_* (Berget) credentials
+cp .env.example .env               # fill in real EMBEDDING_*/LLM_* credentials
 uv sync --extra dev                # install (Python 3.13 via uv)
 uv run pytest                      # full suite (real Weaviate + SQLite + real provider)
 uv run ruff check src tests        # lint
@@ -52,5 +53,5 @@ errors to surface (that's the point: we don't hide them behind a fake). Re-run i
 dependency hiccups.
 
 Config is environment-driven and fail-loud — see `.env.example`. The component is built
-as an image and run as a container (e.g. on the ztein Mac Mini); deployment is **not**
-part of this repo so it can run anywhere.
+as an image and run as a container; deployment is **not** part of this repo so it can run
+in any environment.
