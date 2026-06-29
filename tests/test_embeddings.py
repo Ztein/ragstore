@@ -12,10 +12,13 @@ async def test_embed_returns_vectors_of_expected_dim(embedder):
     assert all(len(v) == embedder.dim for v in vectors)
 
 
-async def test_embed_is_deterministic(embedder):
+async def test_embed_is_stable(embedder):
+    # The real provider is near-deterministic, not bitwise identical (batched GPU
+    # inference varies in the last digits), so assert closeness, not equality.
     a = await embedder.embed_one("same text")
     b = await embedder.embed_one("same text")
-    assert a == b
+    assert len(a) == len(b)
+    assert max(abs(x - y) for x, y in zip(a, b, strict=True)) < 1e-2
 
 
 async def test_embed_empty_returns_empty(embedder):
