@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+tests
+DOCS
+.env
+*.db
+*.db-*
+data
+docker-compose.yml
+.github
+*.md
+!README.md

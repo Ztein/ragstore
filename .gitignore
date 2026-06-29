@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local data / secrets
+.env
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# OS
+.DS_Store
+
+# Tooling
+.claude/

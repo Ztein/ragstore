@@ -1,0 +1,58 @@
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.28.4
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --scheme
+      - http
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      QUERY_DEFAULTS_LIMIT: "25"
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: /var/lib/weaviate
+      DEFAULT_VECTORIZER_MODULE: none
+      ENABLE_MODULES: ""
+      CLUSTER_HOSTNAME: node1
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  ragstore:
+    build: .
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    ports:
+      - "8810:8810"
+    environment:
+      RAGSTORE_API_KEY: ${RAGSTORE_API_KEY:-}
+      SQLITE_PATH: /data/ragstore.db
+      WEAVIATE_HTTP_HOST: weaviate
+      WEAVIATE_HTTP_PORT: "8080"
+      WEAVIATE_GRPC_HOST: weaviate
+      WEAVIATE_GRPC_PORT: "50051"
+      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+    volumes:
+      - ragstore_data:/data
+    restart: unless-stopped
+    profiles: ["full"]
+
+volumes:
+  weaviate_data:
+  ragstore_data:
