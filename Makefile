@@ -25,4 +25,5 @@ build:
 	docker build -t $(IMAGE) .
 
 scan:
-	trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --scanners vuln $(IMAGE)
+	trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --scanners vuln \
+		--trivyignores .trivyignore $(IMAGE)
