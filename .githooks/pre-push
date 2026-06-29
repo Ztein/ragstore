@@ -1,0 +1,19 @@
+#!/bin/sh
+# Pre-push gate: run the full suite LOCALLY against the real dependencies before any push.
+# Tests are intentionally NOT run in GitHub Actions — they need a real Weaviate and a real
+# embedding/LLM provider, and we don't want provider credentials living as cloud secrets.
+#
+# Install once:  make hooks   (sets core.hooksPath to .githooks)
+# Requirements:  Weaviate running (docker compose up -d weaviate) and a populated .env.
+set -e
+
+echo "[pre-push] ruff check"
+uv run ruff check src tests
+
+echo "[pre-push] ruff format --check"
+uv run ruff format --check src tests
+
+echo "[pre-push] pytest (real Weaviate + SQLite + real provider)"
+uv run pytest -q
+
+echo "[pre-push] OK"

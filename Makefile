@@ -1,9 +1,13 @@
 IMAGE ?= ragstore:dev
 
-.PHONY: install test lint up down build scan
+.PHONY: install hooks test lint up down build scan
 
 install:
 	uv sync --extra dev
+
+hooks:
+	git config core.hooksPath .githooks
+	@echo "pre-push hook enabled (runs lint + format + full test suite locally)"
 
 up:
 	docker compose up -d weaviate

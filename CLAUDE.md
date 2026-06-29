@@ -43,10 +43,16 @@ Module map (`src/ragstore/`): `config.py` (fail-loud settings), `sqlite_store.py
 docker compose up -d weaviate      # start the real Weaviate dependency
 cp .env.example .env               # fill in real EMBEDDING_*/LLM_* credentials
 uv sync --extra dev                # install (Python 3.13 via uv)
+make hooks                         # enable the pre-push hook (lint + format + tests)
 uv run pytest                      # full suite (real Weaviate + SQLite + real provider)
 uv run ruff check src tests        # lint
 make build && make scan            # build image + Trivy gate
 ```
+
+**Tests run locally, not in GitHub Actions.** They need a real Weaviate and a real
+embedding/LLM provider, and we deliberately keep provider credentials off GitHub. The
+`pre-push` hook (`make hooks`) runs lint + format + the full suite before every push.
+GitHub Actions only does no-secret guards (lint/format, image build, Trivy CVE gate).
 
 The suite hits the real embedding/LLM provider — expect occasional transient provider
 errors to surface (that's the point: we don't hide them behind a fake). Re-run if a real
